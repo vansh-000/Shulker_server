@@ -155,6 +155,7 @@ const scheduleMeeting = asyncHandler(async (req, res) => {
     invitedParticipants: participants,
     status: 'scheduled',
   });
+  await meeting.populate('createdBy', 'username email');
 
   for (const email of participants) {
     const subject = 'You’re Invited! Join a Meeting Scheduled by SHULKER';
@@ -166,7 +167,7 @@ You’ve been invited to join a meeting organized via SHULKER.
 
 📅 Meeting Details
 - Meeting ID: ${meetingUUID}
-- Meeting Organizer: ${meeting.createdBy.firstname}
+- Meeting Organizer: ${meeting.createdBy.username}
 - Scheduled Time: ${new Date(meeting.scheduledTime).toLocaleString()}
 
 To accept the invitation and join the meeting, please click the link below:
@@ -189,7 +190,7 @@ The SHULKER Team
 
 const addParticipants = asyncHandler(async (req, res) => {
   const { meetingId, participants } = req.body;
-  const meeting = await Meeting.findOne({ meetingId });
+  const meeting = await Meeting.findOne({ meetingId }).populate('createdBy', 'username email');
   if (!meeting) throw new ApiError('Meeting not found', 404);
 
   for (const email of participants) {
@@ -205,7 +206,7 @@ You’ve been invited to join a meeting organized via SHULKER.
 
 📅 Meeting Details
 - Meeting ID: ${meetingId}
-- Meeting Organizer: ${meeting.createdBy.firstname}
+- Meeting Organizer: ${meeting.createdBy.username}
 - Scheduled Time: ${new Date(meeting.scheduledTime).toLocaleString()}
 
 To accept the invitation and join the meeting, please click the link below:
