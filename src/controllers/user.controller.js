@@ -310,16 +310,33 @@ const personalMeetingRoom = asyncHandler(async (req, res) => {
   const userId = String(req.user._id);
   const { meetingId } = req.body;
 
-  const user = await User.findById(userId);
-  if (!user) throw new ApiError('User not found', 404);
+  if (!meetingId) throw new ApiError("meetingId is required", 400);
 
   const meeting = await Meeting.findOne({ meetingId });
-  if (!meeting) throw new ApiError('Meeting not found', 404);
+  if (!meeting) throw new ApiError("Meeting not found", 404);
 
-  user.personalRoomId = meeting._id;
-  await user.save();
+  if (meeting.createdBy.toString() !== userId) {
+    throw new ApiError("You cannot set another user's meeting as your personal room", 403);
+  }
 
-  res.json(new ApiResponse('Personal meeting room set successfully', 200, user));
+  const updatedUser = await User.findByIdAndUpdate(
+    userId,
+    { personalRoomId: meeting._id },
+    { new: true }
+  ).lean();
+
+  delete updatedUser.password;
+  delete updatedUser.refreshToken;
+  delete updatedUser.resetPasswordToken;
+  delete updatedUser.emailVerificationToken;
+
+  res.json(
+    new ApiResponse(
+      "Personal meeting room set successfully",
+      200,
+      updatedUser
+    )
+  );
 });
 
 export {
