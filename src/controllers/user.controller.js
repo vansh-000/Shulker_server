@@ -130,9 +130,19 @@ const resetPassword = asyncHandler(async (req, res) => {
 });
 
 const getCurrentUser = asyncHandler(async (req, res) => {
-  // i want to populate meeting in user's personalRoomId
   const userId = req.user._id;
-  const user = await User.findById(userId).select("-password -refreshToken").populate({ path: 'personalRoomId', model: 'Meeting' });
+
+  const user = await User.findById(userId)
+    .select("-password -refreshToken")
+    .populate({
+      path: "personalRoomId",
+      model: "Meeting",
+      populate: [
+        { path: "createdBy", model: "User", select: "username email avatar" },
+        { path: "participants", model: "User", select: "username email avatar" }
+      ]
+    });
+
   if (!user) {
     throw new ApiError("User not found", 404);
   }
@@ -318,6 +328,9 @@ const personalMeetingRoom = asyncHandler(async (req, res) => {
   if (meeting.createdBy.toString() !== userId) {
     throw new ApiError("You cannot set another user's meeting as your personal room", 403);
   }
+
+  meeting.status = 'personal';
+  await meeting.save();
 
   const updatedUser = await User.findByIdAndUpdate(
     userId,

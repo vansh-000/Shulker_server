@@ -41,7 +41,7 @@ const meetingSchema = new Schema(
     },
     status: {
       type: String,
-      enum: ["scheduled", "ongoing", "ended"],
+      enum: ["scheduled", "ongoing", "ended","personal"],
       default: "scheduled",
     },
     endedAt: {
