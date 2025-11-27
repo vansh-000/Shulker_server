@@ -132,7 +132,10 @@ npm run dev           # or nodemon src/server.js
 
 ---
 
-## 📌 API Routes (Modular & Tabulated)
+## 📌 API Routes and Database diagram
+
+### **Database Diagram**
+<img width="1426" height="896" alt="Image" src="https://github.com/user-attachments/assets/3105e074-e80b-4923-8f70-fd77298ba728" />
 
 ### 👤 **Auth & User Routes**
 
