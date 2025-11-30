@@ -139,7 +139,7 @@ const getCurrentUser = asyncHandler(async (req, res) => {
       model: "Meeting",
       populate: [
         { path: "createdBy", model: "User", select: "username email avatar" },
-        { path: "participants", model: "User", select: "username email avatar" }
+        { path: "members.user", model: "User", select: "username email avatar" }
       ]
     });
 
